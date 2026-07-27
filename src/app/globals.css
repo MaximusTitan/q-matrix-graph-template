@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/*
+ * The interface is dark-only by design. The subject palette is stepped and
+ * validated for this exact surface, and a 3D force graph on a light background
+ * loses the link encoding entirely — faint edges simply disappear.
+ */
+:root {
+  --surface-0: #12120f; /* canvas */
+  --surface-1: #16160f; /* panels */
+  --text-primary: #f4f3ec;
+  --text-secondary: #c5c4b8;
+  --text-muted: #8f8e83;
+}
+
+@theme inline {
+  --color-background: var(--surface-0);
+  --color-foreground: var(--text-primary);
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+body {
+  background: var(--surface-0);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+/* Keyboard focus must stay visible over the canvas and over glass panels. */
+:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+/* react-force-graph injects its hover tooltip outside the React tree. */
+.graph-tooltip {
+  background: transparent !important;
+  padding: 0 !important;
+  font-family: var(--font-sans) !important;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.12);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 0.22);
+  background-clip: content-box;
+}

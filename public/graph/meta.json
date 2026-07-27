@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": null,
+  "board": "none",
+  "subjects": [],
+  "inventory": {},
+  "integrity": {
+    "chapterFiles": 0,
+    "rows": 0,
+    "nodes": 0,
+    "edges": 0,
+    "edgesByLevel": { "L1": 0, "L2": 0, "L3": 0 },
+    "derivedEdges": 0,
+    "crossSubjectEdges": 0,
+    "crossGradeEdges": 0,
+    "isolatedNodes": 0,
+    "cycles": { "cyclicComponents": 0, "nodesInCycles": 0, "largestCycle": 0 },
+    "unresolvedRefs": 0,
+    "selfLoops": 0,
+    "warnings": ["placeholder data — run `npm run sync:graph` against your own KB_ROOT"]
+  }
+}
