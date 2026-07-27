@@ -2,7 +2,7 @@
 
 > A 3D knowledge-graph viewer for a Q-Matrix curriculum export — pairs with
 > [q-matrix-agents](https://github.com/MaximusTitan/q-matrix-agents) and your own
-> [q-matrix-kb](https://github.com/<you>/q-matrix-kb-template).
+> [q-matrix-kb](https://github.com/MaximusTitan/q-matrix-kb-template).
 
 This repo is the **viewer**, not the data. It renders concepts, wired together by
 prerequisite links, stacked into one layer per grade so a curriculum reads top to bottom —
