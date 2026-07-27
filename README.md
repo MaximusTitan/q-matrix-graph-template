@@ -353,14 +353,14 @@ A static export makes the **entire curriculum corpus you sync in publicly downlo
 concepts, skills and prerequisite rationales for every chapter in your KB — from whatever
 host serves the site. That may be fine for material you're licensed to redistribute, and a
 problem otherwise. Decide the hosting visibility deliberately, and see the rights notice in
-[q-matrix-kb-template](https://github.com/<you>/q-matrix-kb-template) before you publish a
+[q-matrix-kb-template](https://github.com/MaximusTitan/q-matrix-kb-template) before you publish a
 deployment of your own data.
 
 ## Related
 
 - **[q-matrix-agents](https://github.com/MaximusTitan/q-matrix-agents)** — orchestrator,
   agents, skills, dashboard, and `scripts/export_graph.py` (the code layer)
-- **[q-matrix-kb-template](https://github.com/<you>/q-matrix-kb-template)** — empty
+- **[q-matrix-kb-template](https://github.com/MaximusTitan/q-matrix-kb-template)** — empty
   knowledge-base skeleton; `KB_ROOT` points at your clone of this
 
 ## License
