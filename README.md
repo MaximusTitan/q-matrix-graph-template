@@ -18,6 +18,10 @@ data yet" screen instead of a graph. The data comes from **your own** knowledge 
 **No backend.** The site is a static export over three JSON files — deployable to Vercel,
 Netlify, Cloudflare Pages or GitHub Pages with nothing running server-side.
 
+## Paper
+
+This repo implements the visualization tooling described in *Curriculum Brain: A Semi-Automated Framework for Q-Matrix Creation* — [read the draft](https://prickly-gopher-95e.notion.site/Curriculum-Brain-3a3527ed7aee80cc97f7ee52e302249e).
+
 ## Quick start
 
 ```bash
@@ -362,6 +366,8 @@ deployment of your own data.
   agents, skills, dashboard, and `scripts/export_graph.py` (the code layer)
 - **[q-matrix-kb-template](https://github.com/MaximusTitan/q-matrix-kb-template)** — empty
   knowledge-base skeleton; `KB_ROOT` points at your clone of this
+- **[q-matrix-dataset](https://github.com/MaximusTitan/q-matrix-dataset)** — a released,
+  point-in-time snapshot of curriculum data this viewer can render
 
 ## License
 
