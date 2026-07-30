@@ -75,7 +75,12 @@ export interface ConceptDetails {
 
 export interface GraphMeta {
   schemaVersion: number;
-  generatedAt: string;
+  /**
+   * Export timestamp. Null in the placeholder `meta.json` that ships with this
+   * template, and null in any hand-authored graph that omits it — so consumers
+   * must guard before calling string methods on it.
+   */
+  generatedAt: string | null;
   board: string;
   subjects: string[];
   inventory: Record<string, Record<string, { chapters: number; concepts: number }>>;

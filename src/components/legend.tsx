@@ -86,7 +86,7 @@ export default function Legend({ meta, mode }: { meta: GraphMeta; mode: LayoutMo
             value={`${integrity.cycles.cyclicComponents} (${integrity.cycles.nodesInCycles} concepts)`}
           />
           <Row label="Unresolved refs" value={integrity.unresolvedRefs.toLocaleString()} />
-          <Row label="Exported" value={meta.generatedAt.slice(0, 10)} />
+          <Row label="Exported" value={meta.generatedAt?.slice(0, 10) ?? "unknown"} />
         </dl>
       )}
     </div>
