@@ -1,8 +1,8 @@
 # q-matrix-graph-template
 
 > A 3D knowledge-graph viewer for a Q-Matrix curriculum export — pairs with
-> [q-matrix-agents](https://github.com/MaximusTitan/q-matrix-agents) and your own
-> [q-matrix-kb](https://github.com/MaximusTitan/q-matrix-kb-template).
+> [q-matrix-agents](https://github.com/MaximusTitan/q-matrix-agents) and your own clone of
+> [q-matrix-kb-template](https://github.com/MaximusTitan/q-matrix-kb-template).
 
 This repo is the **viewer**, not the data. It renders concepts, wired together by
 prerequisite links, stacked into one layer per grade so a curriculum reads top to bottom —
@@ -18,6 +18,24 @@ data yet" screen instead of a graph. The data comes from **your own** knowledge 
 **No backend.** The site is a static export over three JSON files — deployable to Vercel,
 Netlify, Cloudflare Pages or GitHub Pages with nothing running server-side.
 
+## Open source, and meant to be forked
+
+This is a **template**, and forking it is the point. Clone it, point it at your own
+curriculum, restyle it, rip out the parts you don't want — it's yours to build a graph
+viewer from. Everything here is Apache-2.0 (see [LICENSE](LICENSE)), so use it in personal,
+academic or commercial work freely.
+
+**We're not taking pull requests on this repo right now.** Not because contributions aren't
+welcome — they genuinely are — but because a template is most useful when downstream forks
+diverge rather than converge, and we'd rather you shape your copy than negotiate ours. Issues
+and questions are fine; if you find something plainly broken, opening an issue is the fastest
+way to get it fixed here.
+
+If you'd like to contribute to the Q-Matrix project itself, the open repo is
+**[q-matrix-dataset](https://github.com/MaximusTitan/q-matrix-dataset)** — that's where
+curriculum data lands and where contributions are actively wanted. See
+[Related](#related) for the rest of the family.
+
 ## Paper
 
 This repo implements the visualization tooling described in *Curriculum Brain: A Semi-Automated Framework for Q-Matrix Creation* — [read the draft](https://prickly-gopher-95e.notion.site/Curriculum-Brain-3a3527ed7aee80cc97f7ee52e302249e).
@@ -30,7 +48,20 @@ npm run dev            # http://localhost:3000
 ```
 
 With the placeholder data in place, this shows the empty state. To see your own
-curriculum, populate `public/graph/` first — see below.
+curriculum, populate `public/graph/` first — see [Updating the data](#updating-the-data).
+
+The full set of scripts, all of them from `package.json`:
+
+```bash
+npm run dev            # next dev
+npm run build          # static export -> out/
+npm run serve:out      # serve out/ via npx serve, no backend
+npm run typecheck      # tsc --noEmit
+npm run lint           # eslint
+npm run sync:graph     # regenerate public/graph/ from your KB (see below)
+```
+
+There is no test suite in this repo.
 
 ## The three files
 
@@ -45,7 +76,7 @@ The two data files are **joined by node id**, and the split is purely by access 
 which is most of the bytes and none of the pixels — so it is fetched only when a concept is
 actually opened, then memoised.
 
-The relationship is exactly 1:1 in both directions, which the loader relies on:
+The relationship the exporter emits is 1:1 in both directions:
 
 ```
 graph-core.nodes[i].id  ─────────▶  concept-details.details[id]
@@ -59,7 +90,8 @@ Every node has a detail entry, and each `prereqs` entry corresponds to exactly o
 `prereqs[k].from` is the link's `s`, the detail's own key is the `t`, and `level` is the
 `l`. So `concept-details.json` is an **annotation layer over the same edge set**, not a
 second graph. The detail panel resolves `from` back through `graph-core`'s nodes to render
-a clickable prerequisite.
+a clickable prerequisite, and skips any `from` it cannot resolve rather than failing — a
+hand-edited or truncated details file degrades to a thinner panel, not a crash.
 
 ## Where the data comes from
 
@@ -80,13 +112,6 @@ Within the graph, edges carry that distinction explicitly. `derived: true` (`d` 
 precedes skill B, then concept(A) precedes concept(B) — filterable in the UI via *Hide
 inferred links*. The remaining edges are each judged by an agent and may carry written
 reasoning, which is what the detail panel shows.
-
-```bash
-npm run build          # static export -> out/
-npm run serve:out      # serve the export with no backend
-npm run typecheck
-npm run lint
-```
 
 ## Updating the data
 
@@ -189,10 +214,21 @@ layout anchors. Grade sliders and layer rings adapt on their own. Note that anch
 
 **Budget real time for the colour.** The three shipped hues are the validated prefix of a
 categorical palette, stepped for the dark canvas, and no fourth hue from that ramp can join
-them without redoing the gates — see the validated palette table and per-candidate ΔE
-figures in `src/lib/palette.ts`'s comments. A fourth subject means **re-stepping all four
-colours together**. Re-run `scripts/validate_palette.js` from the `dataviz` skill against
-your canvas surface color with `--pairs all` before committing to any set.
+them without redoing the gates — the gate results and worst-pair ΔE figures are recorded in
+`src/lib/palette.ts`'s header comment. A fourth subject means **re-stepping all four colours
+together**. The validator itself is not vendored here; it ships with the `dataviz` skill as
+`scripts/validate_palette.js`. Re-run it against your canvas surface colour with
+`--pairs all` before committing to any set, or substitute an equivalent all-pairs check.
+
+### Other things a fork will want to change
+
+Two strings are hardcoded to the example curriculum and will read wrong against yours:
+
+- the header subtitle in `src/components/graph-explorer.tsx` ends with a literal
+  `Grades 1–10`. The grade *sliders* and the layer rings derive their range from the data
+  and adapt on their own — this one line does not.
+- `src/app/layout.tsx` sets the page `<title>` and description. The on-screen heading uses
+  `meta.board`, so it follows your export, but the tab title does not.
 
 ## How to read the graph
 
@@ -200,7 +236,7 @@ your canvas surface color with `--pairs all` before committing to any set.
 |---|---|
 | **Colour** | subject |
 | **Height** | grade (lowest grade at the top) — or prerequisite depth, also descending |
-| **Node size** | skills taught under the concept, switchable to downstream reach |
+| **Node size** | skills taught under the concept by default; switchable to concepts unlocked, or total connections |
 | **Link brightness** | prerequisite scope — L1 faintest, L3 brightest |
 
 Links point **from a prerequisite to what it unlocks**. Every layered mode runs top-down,
@@ -209,7 +245,11 @@ downward.
 
 **Click any concept** for its skills, its prerequisites with the reasoning behind each, and
 what it unlocks. **Focus this chain** isolates everything upstream and downstream of a
-concept and dims the rest. Search matches concept names; `?node=<id>` deep-links to one.
+concept and dims the rest. Search matches concept names, from two characters up.
+
+Two URL parameters, both written back as you explore, so the address bar is always a
+shareable link to the current view: `?node=<id>` selects and flies to one concept, and
+`?mode=layered|depth|free` picks the layout.
 
 ### Navigating
 
@@ -288,8 +328,9 @@ genuinely changes what counts as a starting point.
 **The palette is validated, not chosen.** The three shipped subject hues are the first
 three slots of a categorical palette stepped for the dark canvas — specifically the prefix
 that clears every gate under an *all-pairs* comparison, which is the right test when all
-subjects are on screen at once. See `src/lib/palette.ts` for the exact contrast and CVD
-figures this was validated against.
+subjects are on screen at once. `src/lib/palette.ts` records which gates were checked, the
+surface colour they were checked against, and the worst-pair ΔE under normal and deutan
+vision.
 
 Do not add a fourth hue without re-validating — the next slot in that ramp fails the
 all-pairs floors against a hue already in use. A fourth distinction belongs in another
@@ -328,15 +369,26 @@ skips the reheat.
 ## Layout
 
 ```
-src/lib/types.ts        contract mirror + SCHEMA_VERSION guard
+src/app/                 root layout (dark-only, system fonts) and the single page
+src/lib/types.ts         contract mirror + SCHEMA_VERSION guard
 src/lib/graph.ts         loading, adjacency, focus traversal, search
 src/lib/layout.ts        grade layers, subject anchoring, SCC + depth
 src/lib/nav.ts           canvas tools and their shortcuts
 src/lib/palette.ts       subject hues, level styling, size metrics
-src/components/          graph-canvas · detail-panel · controls · nav-toolbar
-                         search-box · legend
+src/components/
+  graph-explorer.tsx     the one stateful component: load, filter, select, focus
+  graph-canvas.tsx       three.js / react-force-graph, camera, layer rings
+  detail-panel.tsx       skills, prerequisites with rationale, dependents
+  controls.tsx           layout mode, size metric, subject/grade/level filters
+  nav-toolbar.tsx        select · move · fit · spin
+  search-box.tsx         concept search with keyboard navigation
+  legend.tsx             encoding key + integrity summary
 public/graph/            placeholder data (committed) — replace via npm run sync:graph
 ```
+
+There is no `src/app/api/`, no server component that reads data, and no database. `page.tsx`
+renders one client component; every byte of curriculum comes from `fetch("graph/…")` against
+the three static files.
 
 ## Security
 
@@ -363,12 +415,17 @@ deployment of your own data.
 ## Related
 
 - **[q-matrix-agents](https://github.com/MaximusTitan/q-matrix-agents)** — orchestrator,
-  agents, skills, dashboard, and `scripts/export_graph.py` (the code layer)
+  agents, skills, dashboard, and `scripts/export_graph.py` (the code layer). Open source,
+  not taking PRs.
 - **[q-matrix-kb-template](https://github.com/MaximusTitan/q-matrix-kb-template)** — empty
-  knowledge-base skeleton; `KB_ROOT` points at your clone of this
+  knowledge-base skeleton; `KB_ROOT` points at your clone of this. Open source, not taking
+  PRs.
 - **[q-matrix-dataset](https://github.com/MaximusTitan/q-matrix-dataset)** — a released,
-  point-in-time snapshot of curriculum data this viewer can render
+  point-in-time snapshot of curriculum data this viewer can render. **This is the repo open
+  for community contribution.**
+- **[Curriculum Brain (paper draft)](https://prickly-gopher-95e.notion.site/Curriculum-Brain-3a3527ed7aee80cc97f7ee52e302249e)**
+  — the framework these repos implement.
 
 ## License
 
-Apache License 2.0 — see [LICENSE](LICENSE).
+Apache License 2.0 — see [LICENSE](LICENSE). Copyright 2026 Intelliana.
